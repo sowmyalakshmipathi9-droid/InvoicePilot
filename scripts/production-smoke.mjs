@@ -165,7 +165,9 @@ try {
     body: JSON.stringify({ text: "A realistic invoice text that is long enough." }),
   });
   assert.equal(extracted.status, 200);
-  assert.equal((await json(extracted)).model, "smoke-test-model");
+  const liveResult = await json(extracted);
+  assert.equal(liveResult.model, "smoke-test-model");
+  assert.equal(liveResult.extraction.vendor, modelExtraction.vendor);
 
   ollamaUnavailable = true;
   const unavailable = await globalThis.fetch(`${live.baseUrl}/api/extract`, {
@@ -219,6 +221,25 @@ try {
   assert.match((await json(response)).error, /demo fixture/);
 } finally {
   await close(demo.server);
+}
+
+for (const environment of [
+  { EXTRACTION_API_TOKEN: token },
+  { OLLAMA_BASE_URL: `http://127.0.0.1:${ollama.address().port}` },
+]) {
+  const partiallyConfigured = await startApp({ environment });
+  try {
+    const status = await json(await globalThis.fetch(`${partiallyConfigured.baseUrl}/api/extract`));
+    assert.equal(status.mode, "demo");
+    const response = await globalThis.fetch(`${partiallyConfigured.baseUrl}/api/extract`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: "A realistic invoice text that is long enough." }),
+    });
+    assert.equal(response.status, 503);
+  } finally {
+    await close(partiallyConfigured.server);
+  }
 }
 
 const unexpected = await startApp({

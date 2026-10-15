@@ -53,4 +53,49 @@ describe("Ollama extraction", () => {
     await expect(extractWithOllama("private invoice text", config, unavailable))
       .rejects.toThrow(OllamaError);
   });
+
+  it("rejects malformed provider envelopes and schema-invalid model output", async () => {
+    const malformedEnvelope = vi.fn().mockResolvedValue(new Response("not json"));
+    await expect(extractWithOllama("A realistic invoice text that is long enough.", config, malformedEnvelope))
+      .rejects.toThrow(/unreadable response/);
+
+    const invalidFields = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      model: config.model,
+      message: { content: JSON.stringify({ ...JSON.parse(modelJson), total: "26.16" }) },
+    })));
+    await expect(extractWithOllama("A realistic invoice text that is long enough.", config, invalidFields))
+      .rejects.toThrow(/expected invoice fields/);
+  });
+
+  it("gives actionable guidance when the model is unavailable", async () => {
+    const missingModel = vi.fn().mockResolvedValue(new Response("not found", { status: 404 }));
+    await expect(extractWithOllama("A realistic invoice text that is long enough.", config, missingModel))
+      .rejects.toThrow(/ollama pull gemma3:4b/);
+
+    const providerFailure = vi.fn().mockResolvedValue(new Response("unavailable", { status: 503 }));
+    await expect(extractWithOllama("A realistic invoice text that is long enough.", config, providerFailure))
+      .rejects.toThrow(/HTTP 503/);
+  });
+
+  it("reports an upstream timeout without exposing document text", async () => {
+    const timeout = vi.fn().mockRejectedValue(
+      Object.assign(new Error("request timed out"), { name: "TimeoutError" }),
+    );
+    await expect(extractWithOllama("private invoice text", config, timeout))
+      .rejects.toThrow(/too long to respond/);
+    expect(timeout.mock.calls[0][1].signal).toBeDefined();
+  });
+
+  it("rejects invalid and non-HTTP Ollama endpoints before making a request", async () => {
+    const request = vi.fn();
+    await expect(extractWithOllama("A realistic invoice text that is long enough.", {
+      ...config,
+      baseUrl: "not a URL",
+    }, request)).rejects.toThrow(/OLLAMA_BASE_URL/);
+    await expect(extractWithOllama("A realistic invoice text that is long enough.", {
+      ...config,
+      baseUrl: "file:///tmp/ollama",
+    }, request)).rejects.toThrow(/HTTP or HTTPS/);
+    expect(request).not.toHaveBeenCalled();
+  });
 });

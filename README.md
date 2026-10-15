@@ -107,13 +107,13 @@ Vite provides `GET /api/extract` (configured model and processing-location statu
 
 ## Render deployment
 
-The included [`render.yaml`](./render.yaml) creates a Node web service on Render's free plan with the repository root as its root directory, build command `npm ci && npm run build`, start command `npm start`, and health check `/api/extract`. The blueprint intentionally does not configure an Ollama host or API token, so a fresh deployment serves the app in demo-fixture-only mode until secure live inference is configured.
+The included [`render.yaml`](./render.yaml) creates a Node web service on Render's free plan with the repository root as its root directory, build command `npm ci && npm run build`, start command `npm start`, and health check `/api/extract`. It sets `OLLAMA_MODEL` but intentionally omits `OLLAMA_BASE_URL` and `EXTRACTION_API_TOKEN`; those two missing production settings are why a fresh deployment reports demo-fixture-only mode and disables the live extraction button. The blueprint does not run Ollama, download model weights, or make a developer machine's localhost reachable from Render.
 
 1. Push this repository to GitHub and create a Render Blueprint from it. Review the blueprint values before confirming. No service or paid add-on is created by this project automatically.
 2. Render builds with Node 20.19+/npm 10.x using `npm ci && npm run build` and starts the production server with `npm start`. Do not use `vite preview` as the production server.
 3. For live inference, configure these values under **Render Dashboard → service → Environment**:
-   - `OLLAMA_BASE_URL`: the reachable Ollama-compatible endpoint ending at the API base. Private-network HTTP/HTTPS hosts are supported; remote public hosts must use HTTPS and an authenticated gateway.
-   - `OLLAMA_MODEL`: a model already installed on that Ollama host, such as `gemma3:4b`.
+   - `OLLAMA_BASE_URL`: the reachable Ollama-compatible service's base URL (for example `https://ollama-gateway.example.com`, without an `/api/chat` suffix). Private-network HTTP/HTTPS hosts are supported; remote public hosts must use HTTPS and an authenticated gateway.
+   - `OLLAMA_MODEL`: a model already installed on that Ollama host, such as `gemma3:4b`; download it on the model host with `ollama pull gemma3:4b`.
    - `EXTRACTION_API_TOKEN`: a newly generated random token of at least 32 bytes. Keep it in Render's secret environment settings, and distribute it only to authorized users; they enter it in the live extraction form. The browser does not receive it from the server or save it.
    - `CORS_ORIGINS` (optional): exact comma-separated HTTPS origins only if a separate trusted UI origin needs cross-origin API access. Leave unset for the single-origin Render blueprint.
    - `OLLAMA_API_KEY`: required when `OLLAMA_BASE_URL` is a public HTTPS gateway; optional for a trusted private-network endpoint. It is sent only in the server-to-gateway request. Do not add a `VITE_` prefix.
@@ -122,6 +122,8 @@ The included [`render.yaml`](./render.yaml) creates a Node web service on Render
 5. Test a fictional sample first. Check logs for startup/errors only; InvoicePilot does not log request bodies or invoice content. Set environment changes only in Render's dashboard, not in committed files.
 
 **Ollama reachability and security:** `127.0.0.1` in a Render service is the Render container, not your personal computer, and does not connect to an Ollama app running on your laptop. A Render-hosted app needs an Ollama host reachable by Render over HTTPS or a private network. For a public HTTPS host, place Ollama behind a gateway that requires authentication and set `OLLAMA_API_KEY`; a public native Ollama listener is not safe. The production server enables live inference only for private-network HTTP(S), or public HTTPS with that gateway key. If you cannot provide a trusted, reachable endpoint, leave live inference disabled and use the explicitly labeled demo fixtures instead. The shared extraction token is a basic service gate, not user accounts or per-user authorization. The endpoint limits requests to 10 per minute per source address per running instance; counters are in-memory and reset on restart. Render's free service may sleep and has no persistent filesystem requirement; the expense ledger remains in each user's browser.
+
+The provider calls the configured Ollama `/api/chat` endpoint from the Node server, limits each upstream request to 90 seconds, and validates the returned JSON against the invoice extraction schema. Automated tests mock this service; they do not prove a configured Render host is reachable or that a model produces useful results. Confirm the configured host from the deployed service before describing live inference as operational.
 
 ### Production errors
 
