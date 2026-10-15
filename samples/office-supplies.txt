@@ -1,0 +1,27 @@
+SAMPLE — NOT A REAL INVOICE
+
+PAPERTRAIL SUPPLY HOUSE
+73 Ledger Lane
+Morrow Glen, OR 97001
+receipts@papertrail.example | (503) 555-0104
+
+INVOICE NO.: PSH-51028
+Invoice date: October 6, 2026
+Due date: October 20, 2026
+
+SELLER: Papertrail Supply House
+BUYER: Juniper Vale Research
+6 Compass Fern Court
+Northstar Falls, OR 97000
+payables@junipervale.example
+
+Description                         Qty    Unit price       Amount
+Recycled notebooks                   12      $4.50            $54.00
+Fine-tip pen sets                     5      $8.00            $40.00
+Desktop organizers                    2     $19.50            $39.00
+
+Subtotal                                                      $133.00
+Sales tax (8%)                                                  $10.64
+TOTAL                                                         $143.64 USD
+
+Payment terms: Net 14. Status: Payment due.

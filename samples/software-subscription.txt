@@ -1,0 +1,26 @@
+SAMPLE — NOT A REAL INVOICE
+
+CLOUDHARBOR SOFTWARE
+9 Quiet Circuit Way
+Bellwether Bay, OR 97002
+billing@cloudharbor.example | (503) 555-0103
+
+INVOICE: CHS-2026-7719
+Invoice date: October 1, 2026
+Due date: October 15, 2026
+
+SUPPLIER: Cloudharbor Software
+CUSTOMER: Alder Finch Workshop
+52 Cedar Switchback
+Bellwether Bay, OR 97002
+office@alderfinch.example
+
+Description                         Qty    Unit price       Amount
+Team workspace subscription          1 mo   $49.00           $49.00
+Additional editor seats              5 mo   $12.00 / seat    $60.00
+
+Subtotal                                                      $109.00
+Sales tax (8%)                                                   $8.72
+TOTAL                                                         $117.72 USD
+
+Payment terms: Due upon receipt, net 14. Status: Unpaid.

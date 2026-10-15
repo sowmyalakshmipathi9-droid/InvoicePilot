@@ -1,0 +1,27 @@
+SAMPLE — NOT A REAL INVOICE
+
+JUNIPER WEB WORKS
+41 Pixel Row
+Northstar Falls, OR 97000
+billing@juniperweb.example | (503) 555-0101
+
+INVOICE: JWW-2026-1042
+Invoice date: October 2, 2026
+Due date: November 1, 2026
+
+FROM: Juniper Web Works
+TO: Larkspur Outdoor Co.
+800 Trailhead Loop
+Northstar Falls, OR 97000
+ap@larkspuroutdoor.example
+
+Description                         Qty    Unit price       Amount
+Responsive storefront development   18 hr  $95.00 / hr    $1,710.00
+Deployment and launch support        1      $85.00          $85.00
+
+Subtotal                                                    $1,795.00
+Sales tax (8%)                                                $143.60
+TOTAL                                                       $1,938.60 USD
+
+Payment terms: Net 30. Payment due by November 1, 2026.
+Status: Payment due.

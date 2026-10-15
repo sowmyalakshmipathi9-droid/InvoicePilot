@@ -1,0 +1,26 @@
+SAMPLE — NOT A REAL INVOICE
+
+ALDER RIDGE ADVISORY
+115 Mapglass Terrace
+Bellwether Bay, OR 97002
+billing@alderridge.example | (503) 555-0105
+
+INVOICE: ARA-2026-3306
+Invoice date: September 30, 2026
+Due date: October 30, 2026
+
+CONSULTANT: Alder Ridge Advisory
+CLIENT: Mosslight Fabrication
+204 Tern Harbor Road
+Bellwether Bay, OR 97002
+accounts@mosslight.example
+
+Description                         Qty    Unit price       Amount
+Operations strategy consulting       14 hr $160.00 / hr   $2,240.00
+Process recommendations report         1    $360.00          $360.00
+
+Subtotal                                                    $2,600.00
+Sales tax (8%)                                                $208.00
+TOTAL                                                       $2,808.00 USD
+
+Payment terms: Net 30. Status: Payment due.

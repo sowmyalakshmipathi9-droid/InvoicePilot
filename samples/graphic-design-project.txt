@@ -1,0 +1,26 @@
+SAMPLE — NOT A REAL INVOICE
+
+LANTERN FINCH DESIGN STUDIO
+260 Colorwheel Avenue
+Morrow Glen, OR 97001
+accounts@lanternfinch.example | (503) 555-0102
+
+INVOICE NO.: LF-8837
+Invoice date: September 24, 2026
+Due date: October 24, 2026
+
+SUPPLIER: Lantern Finch Design Studio
+CUSTOMER: Willow & Kite Market
+17 Paperbird Plaza
+Morrow Glen, OR 97001
+finance@willowkite.example
+
+Description                         Qty    Unit price       Amount
+Brand identity design                12 hr  $85.00 / hr    $1,020.00
+Print-ready packaging artwork         1     $180.00          $180.00
+
+Subtotal                                                    $1,200.00
+Sales tax (8%)                                                 $96.00
+TOTAL                                                       $1,296.00 USD
+
+Payment terms: Net 30. Status: Payment due.
