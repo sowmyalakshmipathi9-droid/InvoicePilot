@@ -10,13 +10,20 @@ describe("model status", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue(
-        new Response(JSON.stringify({ model: "gemma3:4b", processingLocation: "local" })),
+        new Response(JSON.stringify({
+          model: "gemma3:4b",
+          processingLocation: "local",
+          mode: "live",
+          authenticationRequired: false,
+        })),
       ),
     );
 
     await expect(loadModelStatus()).resolves.toEqual({
       model: "gemma3:4b",
       processingLocation: "local",
+      mode: "live",
+      authenticationRequired: false,
     });
   });
 

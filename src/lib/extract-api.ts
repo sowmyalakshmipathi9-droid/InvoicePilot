@@ -8,6 +8,8 @@ export function getExtractionStatus(config: OllamaConfig = getOllamaConfig()) {
   return {
     model: config.model,
     processingLocation: isLocalOllama(config) ? "local" : "configured remote Ollama host",
+    mode: "live" as const,
+    authenticationRequired: false,
   };
 }
 
@@ -26,9 +28,9 @@ export async function extractInvoiceRequest(
   try {
     return { status: 200, body: await extractWithOllama(parsed.data.text, config) };
   } catch (error) {
-    const message = error instanceof OllamaError
-      ? error.message
-      : "Extraction failed unexpectedly. Check the Ollama service and try again.";
-    return { status: 503, body: { error: message } };
+    if (error instanceof OllamaError) {
+      return { status: 503, body: { error: error.message } };
+    }
+    return { status: 500, body: { error: "Extraction failed unexpectedly. Try again later." } };
   }
 }

@@ -6,6 +6,8 @@ describe("extraction API", () => {
     expect(getExtractionStatus({ baseUrl: "http://localhost:11434", model: "test-model" })).toEqual({
       model: "test-model",
       processingLocation: "local",
+      mode: "live",
+      authenticationRequired: false,
     });
   });
 

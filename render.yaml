@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: invoicepilot
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/extract
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OLLAMA_MODEL
+        value: gemma3:4b

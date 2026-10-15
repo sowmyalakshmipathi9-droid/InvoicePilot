@@ -7,7 +7,7 @@ import globals from "globals";
 
 export default [
   {
-    ignores: ["dist", "node_modules", ".next", "app/**", "next.config.ts", "tailwind.config.ts"],
+    ignores: ["dist", "dist-server", "node_modules", ".next", "app/**", "next.config.ts", "tailwind.config.ts"],
   },
   js.configs.recommended,
   {

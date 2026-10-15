@@ -29,6 +29,18 @@ describe("Ollama extraction", () => {
     expect(JSON.parse(request.mock.calls[0][1].body).model).toBe(config.model);
   });
 
+  it("sends an optional Ollama API key only to the configured server-side host", async () => {
+    const request = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      model: config.model,
+      message: { content: modelJson },
+    })));
+    await extractWithOllama("A realistic invoice text that is long enough.", {
+      ...config,
+      apiKey: "server-only-key",
+    }, request);
+    expect(request.mock.calls[0][1].headers.Authorization).toBe("Bearer server-only-key");
+  });
+
   it("reports invalid JSON and unreachable services without exposing invoice text", async () => {
     const invalidJson = vi.fn().mockResolvedValue(new Response(JSON.stringify({
       model: config.model,

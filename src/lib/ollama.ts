@@ -8,12 +8,13 @@ export class OllamaError extends Error {
   }
 }
 
-export type OllamaConfig = { baseUrl: string; model: string };
+export type OllamaConfig = { baseUrl: string; model: string; apiKey?: string };
 
 export function getOllamaConfig(environment: NodeJS.ProcessEnv = process.env): OllamaConfig {
   return {
     baseUrl: environment.OLLAMA_BASE_URL || "http://127.0.0.1:11434",
     model: environment.OLLAMA_MODEL || "gemma3:4b",
+    apiKey: environment.OLLAMA_API_KEY,
   };
 }
 
@@ -38,7 +39,10 @@ export async function extractWithOllama(
   try {
     response = await request(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}),
+      },
       body: JSON.stringify({
         model: config.model,
         stream: false,

@@ -58,6 +58,7 @@ export default function App() {
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [modelStatus, setModelStatus] = useState<ModelStatus | null>(null);
+  const [apiToken, setApiToken] = useState("");
   const [storageReady, setStorageReady] = useState(false);
 
   useEffect(() => {
@@ -138,7 +139,10 @@ export default function App() {
     try {
       const response = await fetch("/api/extract", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(apiToken ? { Authorization: `Bearer ${apiToken}` } : {}),
+        },
         body: JSON.stringify({ text: sourceText }),
       });
       const result = await response.json();
@@ -258,7 +262,9 @@ export default function App() {
         <div className="privacy-card">
           <span className="privacy-icon"><ShieldCheck size={17} /></span>
           <strong>Your data stays yours</strong>
-          <p>Documents go to your configured Ollama host. Saved records stay in this browser.</p>
+          <p>{modelStatus?.mode === "demo"
+            ? "Demo fixtures run in this browser; no invoice is sent to an AI service."
+            : "Documents go to your configured Ollama host. Saved records stay in this browser."}</p>
           <a href="#privacy">How storage works <ArrowRight size={13} /></a>
         </div>
         <div className="sidebar-footer"><span className="online-dot" /> Local workspace</div>
@@ -268,7 +274,7 @@ export default function App() {
         <header className="topbar">
           <div className="breadcrumb">Workspace <span>/</span> Overview</div>
           <div className="topbar-right">
-            <span className="model-chip"><span className="model-dot" /> {modelStatus?.model ?? "Checking model"}</span>
+            <span className="model-chip"><span className="model-dot" /> {modelStatus?.mode === "demo" ? "Demo mode · no live AI" : modelStatus?.model ?? "Checking model"}</span>
             <button className="avatar" type="button" aria-label="Local workspace">AP</button>
           </div>
         </header>
@@ -301,7 +307,7 @@ export default function App() {
             </article>
             <article className="summary-card model-summary">
               <div className="summary-head"><span>EXTRACTION MODEL</span><span className="summary-icon blue"><Sparkles size={17} /></span></div>
-              <strong className="model-name">{modelStatus?.model ?? "Connecting…"}</strong>
+              <strong className="model-name">{modelStatus?.mode === "demo" ? "Demo fixtures only" : modelStatus?.model ?? "Connecting…"}</strong>
               <div className="summary-foot">{modelStatus?.processingLocation === "local" ? "Local Ollama · private endpoint" : modelStatus?.processingLocation ?? "Checking configured endpoint"}</div>
             </article>
           </section>
@@ -313,10 +319,27 @@ export default function App() {
             <article className="panel process-panel">
               <div className="panel-heading">
                 <div><div className="section-kicker">01 <span>·</span> NEW EXPENSE</div><h2>Process an invoice</h2></div>
-                <span className="step-badge">AI EXTRACTION</span>
+                <span className="step-badge">{modelStatus?.mode === "demo" ? "DEMO FIXTURES ONLY" : "AI EXTRACTION"}</span>
               </div>
-              <p className="panel-copy">Paste the text from an invoice or receipt. Your configured model finds the details; you decide what gets saved.</p>
+              <p className="panel-copy">{modelStatus?.mode === "demo"
+                ? "Live AI is not configured. Use the explicitly labeled demo fixture to preview pre-authored values; they are not AI output."
+                : "Paste the text from an invoice or receipt. Your configured model finds the details; you decide what gets saved."}</p>
               <form onSubmit={processInvoice}>
+                {modelStatus?.authenticationRequired && (
+                  <>
+                    <label className="field-label" htmlFor="extraction-token">SERVER ACCESS TOKEN <span>Required for live AI</span></label>
+                    <input
+                      id="extraction-token"
+                      className="auth-input"
+                      type="password"
+                      autoComplete="off"
+                      value={apiToken}
+                      onChange={(event) => setApiToken(event.target.value)}
+                      required
+                    />
+                    <p className="token-hint">Ask the service operator for the access token. It stays in memory and is not saved in this browser.</p>
+                  </>
+                )}
                 <label className="field-label" htmlFor="invoice-input">INVOICE OR RECEIPT TEXT <span>Required</span></label>
                 <textarea
                   id="invoice-input"
@@ -329,7 +352,9 @@ export default function App() {
                   required
                   aria-describedby="input-help"
                 />
-                <div className="input-meta" id="input-help"><span>Text is sent only to the Ollama URL you configured.</span><span>{sourceText.length.toLocaleString()} / 30,000</span></div>
+                <div className="input-meta" id="input-help"><span>{modelStatus?.mode === "demo"
+                  ? "Live inference is unavailable; demo fixtures are not AI output."
+                  : "Text is sent only to the configured trusted Ollama host."}</span><span>{sourceText.length.toLocaleString()} / 30,000</span></div>
                 <div className="sample-controls">
                   <label htmlFor="sample-invoice">Load Sample Invoice</label>
                   <select id="sample-invoice" value={selectedSampleId} onChange={(event) => setSelectedSampleId(event.target.value)}>
@@ -343,10 +368,12 @@ export default function App() {
                     Run demo extraction (fixture, not AI)
                   </button>
                 )}
-                <button className="submit-button" type="submit" disabled={busy || sourceText.trim().length < 20}>
-                  {busy ? <><LoaderCircle className="spin" size={17} /> Extracting with {modelStatus?.model ?? "Ollama"}…</> : <><Sparkles size={17} /> Extract invoice details <ArrowRight size={16} /></>}
+                <button className="submit-button" type="submit" disabled={busy || sourceText.trim().length < 20 || modelStatus?.mode === "demo"}>
+                  {busy ? <><LoaderCircle className="spin" size={17} /> Extracting with {modelStatus?.model ?? "Ollama"}…</> : modelStatus?.mode === "demo" ? "Live AI unavailable" : <><Sparkles size={17} /> Extract invoice details <ArrowRight size={16} /></>}
                 </button>
-                <p className="model-hint"><ShieldCheck size={14} /> {modelStatus?.processingLocation === "local" ? "Processing on your configured local Ollama service" : "Processing at your configured Ollama host"}</p>
+                <p className="model-hint"><ShieldCheck size={14} /> {modelStatus?.mode === "demo"
+                  ? "Demo fixture values are pre-authored and never presented as AI results."
+                  : modelStatus?.processingLocation === "local" ? "Processing on your configured local Ollama service" : "Processing at your configured Ollama host"}</p>
               </form>
             </article>
 

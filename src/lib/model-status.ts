@@ -1,6 +1,8 @@
 export type ModelStatus = {
   model: string;
   processingLocation: string;
+  mode: "live" | "demo";
+  authenticationRequired: boolean;
 };
 
 export async function loadModelStatus(): Promise<ModelStatus> {
@@ -16,10 +18,19 @@ export async function loadModelStatus(): Promise<ModelStatus> {
     !("model" in status) ||
     typeof status.model !== "string" ||
     !("processingLocation" in status) ||
-    typeof status.processingLocation !== "string"
+    typeof status.processingLocation !== "string" ||
+    !("mode" in status) ||
+    (status.mode !== "live" && status.mode !== "demo") ||
+    !("authenticationRequired" in status) ||
+    typeof status.authenticationRequired !== "boolean"
   ) {
     throw new Error("The model status response was invalid.");
   }
 
-  return { model: status.model, processingLocation: status.processingLocation };
+  return {
+    model: status.model,
+    processingLocation: status.processingLocation,
+    mode: status.mode,
+    authenticationRequired: status.authenticationRequired,
+  };
 }
